@@ -22,14 +22,14 @@ removing buffers from the list.
 ```lua
     { 'nvim-telescope/telescope.nvim',   tag = '0.1.2' },
     'ThePrimeagen/harpoon', -- optional
-    'norlock/nvim-traveller-buffer',
+    'norlock/nvim-traveller-buffers',
 ```
 
 #### Packer
 ```lua
 use 'nvim-telescope/telescope.nvim', tag = '0.1.2', -- (or whatever version)
 use 'ThePrimeagen/harpoon', -- optional
-use 'norlock/nvim-traveller-buffer',
+use 'norlock/nvim-traveller-buffers',
 ```
 
 ## Usage
