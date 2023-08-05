@@ -44,9 +44,9 @@ nnoremap <leader>b <cmd>lua require('nvim-traveller-buffers').buffers()<cr>
 #### keymapping
 | Key       | Action                 |
 |-----------|:----------------------:|
-| <Tab>     | Next overview          |
-| <S-Tab>   | Previous overview      |
-| <C-d>     | Delete buffer          |
-| <C-h>     | Toggle harpoon         |
-| <C-f>     | Preview scroll down    |
-| <C-b>     | Preview scroll up      |
+| Tab       | Next overview          |
+| S-Tab     | Previous overview      |
+| C-d       | Delete buffer          |
+| C-h       | Toggle harpoon         |
+| C-f       | Preview scroll down    |
+| C-b       | Preview scroll up      |
