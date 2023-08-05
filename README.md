@@ -1,10 +1,11 @@
 # nvim-traveller-buffer
-Better management for buffers, recommended to use a project plugin like (project.nvim /
+Better management for buffers (using Telescope), great to use in combination with a project plugin like (project.nvim /
 nvim-traveller.nvim)
 
 ### Why use it?
-- If you work with multiple projects, your buffer overview can get clogged up quite quickly.
-- It integrates with harpoon, so you don't need to consciously need to stay on top of adding /
+- If you work with multiple projects, the buffer overview can get clogged up quickly using
+the builtin buffer view, but with this plugin it won't.
+- It integrates with harpoon, so you don't need to consciously stay on top of adding /
 removing buffers from the list.
 - Separates (project buffers / other buffers / term buffers)
 
@@ -39,3 +40,13 @@ vim.keymap.set('n', '<leader>b', require('nvim-traveller-buffers').buffers, {})
 ```viml
 nnoremap <leader>b <cmd>lua require('nvim-traveller-buffers').buffers()<cr>
 ```
+
+#### keymapping
+| Key       | Action                 |
+|-----------|:----------------------:|
+| <Tab>     | Next overview          |
+| <S-Tab>   | Previous overview      |
+| <C-d>     | Delete buffer          |
+| <C-h>     | Toggle harpoon         |
+| <C-f>     | Preview scroll down    |
+| <C-b>     | Preview scroll up      |
