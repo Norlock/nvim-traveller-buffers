@@ -7,4 +7,8 @@ function M.buffers()
     proj_buffers:open_telescope()
 end
 
+function M.setup(options)
+    ProjectBuffers.set_options(options)
+end
+
 return M

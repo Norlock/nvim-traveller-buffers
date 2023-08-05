@@ -5,7 +5,17 @@ local only_stdout = " 2> /dev/null"
 local project_buffers_idx = 0
 local other_buffers_idx = 1
 local term_buffers_idx = 2
-local obj
+
+local options = {
+    mappings = {
+        next_tab = nil,
+        previous_tab = nil,
+        preview_scrolling_up = nil,
+        preview_scrolling_down = nil,
+        delete_buffer = nil,
+        harpoon_buffer = nil,
+    }
+}
 
 function ProjectBuffers:new()
     local o = {}
@@ -31,6 +41,10 @@ function ProjectBuffers:new()
     return o
 end
 
+function ProjectBuffers.set_options(opt)
+    options = opt
+end
+
 function ProjectBuffers:open_telescope()
     self.root = self.get_root()
 
@@ -43,6 +57,7 @@ function ProjectBuffers:open_telescope()
     self.show_buffers_idx = project_buffers_idx
 
     local define_preview = function(this, entry, _)
+        vim.api.nvim_win_set_cursor(this.state.winid, { 1, 0 })
         local content = vim.api.nvim_buf_get_lines(entry.bufnr, 0, -1, false)
         vim.api.nvim_buf_set_lines(this.state.bufnr, 0, -1, true, content)
 
@@ -74,11 +89,12 @@ end
 function ProjectBuffers:attach_mappings(promt_buf_id, map)
     local actions = self.actions
     local action_state = self.action_state
+    local mappings = options.mappings
 
-    map('i', "<C-b>", actions.preview_scrolling_up)
-    map('i', "<C-f>", actions.preview_scrolling_down)
+    map('i', mappings.preview_scrolling_up or "<C-b>", actions.preview_scrolling_up)
+    map('i', mappings.preview_scrolling_down or "<C-f>", actions.preview_scrolling_down)
     map('i', "<C-u>", function() end)
-    map('i', "<C-d>", function()
+    map('i', mappings.delete_buffer or "<C-d>", function()
         local entry = action_state.get_selected_entry()
 
         if entry.harpoon_buffer then
@@ -88,8 +104,8 @@ function ProjectBuffers:attach_mappings(promt_buf_id, map)
         actions.delete_buffer(promt_buf_id)
     end)
 
-    map('i', "<C-h>", function()
-        if self.harpoon ~= nil then
+    map('i', mappings.harpoon_buffer or "<C-h>", function()
+        if self.harpoon == nil then
             return
         end
 
@@ -99,12 +115,12 @@ function ProjectBuffers:attach_mappings(promt_buf_id, map)
         self:refresh_buffers(project_buffers_idx)
     end)
 
-    map('i', "<Tab>", function()
+    map('i', mappings.next_tab or "<Tab>", function()
         self.show_buffers_idx = (self.show_buffers_idx + 1) % 3
         self:refresh_buffers(project_buffers_idx)
     end)
 
-    map('i', '<S-Tab>', function()
+    map('i', mappings.previous_tab or '<S-Tab>', function()
         local idx = self.show_buffers_idx - 1
 
         if idx == -1 then

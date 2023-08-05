@@ -15,6 +15,7 @@ removing buffers from the list.
 - [x] Sort based on last time used
 - [x] Keep a maximum of buffers (20)
 - [x] Add to/Remove from  harpoon list (optional)
+- [x] Custom mapping options
 
 ## Install
 
@@ -41,7 +42,23 @@ vim.keymap.set('n', '<leader>b', require('nvim-traveller-buffers').buffers, {})
 nnoremap <leader>b <cmd>lua require('nvim-traveller-buffers').buffers()<cr>
 ```
 
-#### keymapping
+#### Change defaults (optional)
+```lua
+local traveller_buffers = require('nvim-traveller-buffers')
+
+traveller_buffers.setup({
+    mappings = {
+        next_tab = "<Tab>",
+        previous_tab = "<S-Tab>",
+        harpoon_buffer = "<C-h>",
+        delete_buffer = "<C-d>",
+        preview_scrolling_up = "<C-b>",
+        preview_scrolling_down = "<C-f>"
+    }
+})
+```
+
+#### Default keymapping
 | Key       | Action                 |
 |-----------|:----------------------:|
 | Tab       | Next overview          |
