@@ -1,6 +1,6 @@
 local ProjectBuffers = {}
 local max_buffers = 20
-local only_stderr = " > /dev/null"
+local _only_stderr = " > /dev/null"
 local only_stdout = " 2> /dev/null"
 local project_buffers_idx = 0
 local other_buffers_idx = 1
@@ -29,6 +29,7 @@ function ProjectBuffers:new()
         ProjectBuffers.config = require("telescope.config").values
         ProjectBuffers.actions = require("telescope.actions")
         ProjectBuffers.action_state = require("telescope.actions.state")
+        ProjectBuffers.action_utils = require("telescope.actions.utils")
         ProjectBuffers.themes = require("telescope.themes")
         ProjectBuffers.previewers = require("telescope.previewers")
     end
@@ -63,7 +64,9 @@ function ProjectBuffers:open_telescope()
 
         self.previewers.buffer_previewer_maker(entry.value, this.state.bufnr, {
             callback = function()
-                vim.api.nvim_win_set_cursor(this.state.winid, { entry.lnum, entry.col })
+                if entry.lnum < #content then
+                    vim.api.nvim_win_set_cursor(this.state.winid, { entry.lnum, entry.col })
+                end
             end,
         })
     end
@@ -86,10 +89,10 @@ function ProjectBuffers:open_telescope()
     self.picker:find()
 end
 
-function ProjectBuffers:attach_mappings(promt_buf_id, map)
+function ProjectBuffers:attach_mappings(prompt_buf_id, map)
     local actions = self.actions
     local action_state = self.action_state
-    local mappings = options.mappings
+    local mappings = options.mappings or {}
 
     map('i', mappings.preview_scrolling_up or "<C-b>", actions.preview_scrolling_up)
     map('i', mappings.preview_scrolling_down or "<C-f>", actions.preview_scrolling_down)
@@ -101,7 +104,15 @@ function ProjectBuffers:attach_mappings(promt_buf_id, map)
             self.harpoon_mark.rm_file(entry.value)
         end
 
-        actions.delete_buffer(promt_buf_id)
+        actions.delete_buffer(prompt_buf_id)
+    end)
+
+    map('i', mappings.delete_all or "<C-z>", function()
+        self.action_utils.map_entries(prompt_buf_id, function(entry, index, row)
+            vim.cmd("bw " .. entry.bufnr)
+        end)
+
+        self:refresh_buffers(self.show_buffers_idx)
     end)
 
     map('i', mappings.harpoon_buffer or "<C-h>", function()
@@ -136,7 +147,7 @@ function ProjectBuffers:attach_mappings(promt_buf_id, map)
 end
 
 function ProjectBuffers:sort_buffers(buffers)
-    function compare(a, b)
+    local function compare(a, b)
         return a.lastused < b.lastused
     end
 

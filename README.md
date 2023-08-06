@@ -53,17 +53,19 @@ traveller_buffers.setup({
         harpoon_buffer = "<C-h>",
         delete_buffer = "<C-d>",
         preview_scrolling_up = "<C-b>",
-        preview_scrolling_down = "<C-f>"
+        preview_scrolling_down = "<C-f>",
+        delete_all = "<C-z>"
     }
 })
 ```
 
 #### Default keymapping
-| Key       | Action                 |
-|-----------|:----------------------:|
-| Tab       | Next overview          |
-| S-Tab     | Previous overview      |
-| C-d       | Delete buffer          |
-| C-h       | Toggle harpoon         |
-| C-f       | Preview scroll down    |
-| C-b       | Preview scroll up      |
+| Key       | Action                    |
+|-----------|:-------------------------:|
+| Tab       | Next overview             |
+| S-Tab     | Previous overview         |
+| C-d       | Delete buffer             |
+| C-z       | Delete all (excl Harpoon) |
+| C-h       | Toggle harpoon            |
+| C-f       | Preview scroll down       |
+| C-b       | Preview scroll up         |
