@@ -58,14 +58,14 @@ function ProjectBuffers:open_telescope()
     self.show_buffers_idx = project_buffers_idx
 
     local define_preview = function(this, entry, _)
-        vim.api.nvim_win_set_cursor(this.state.winid, { 1, 0 })
+        self.preview_win_id = this.state.winid
         local content = vim.api.nvim_buf_get_lines(entry.bufnr, 0, -1, false)
         vim.api.nvim_buf_set_lines(this.state.bufnr, 0, -1, true, content)
 
         self.previewers.buffer_previewer_maker(entry.value, this.state.bufnr, {
             callback = function()
                 if entry.lnum < #content then
-                    vim.api.nvim_win_set_cursor(this.state.winid, { entry.lnum, entry.col })
+                    vim.api.nvim_win_set_cursor(this.state.winid, { entry.lnum, 0 })
                 end
             end,
         })
@@ -169,6 +169,8 @@ function ProjectBuffers:sort_buffers(buffers)
 end
 
 function ProjectBuffers:refresh_buffers(skip_term_idx)
+    vim.api.nvim_win_set_cursor(self.preview_win_id, { 1, 0 })
+
     if self.show_buffers_idx == project_buffers_idx then
         self.picker:refresh(self:create_finder(self:project_buffers()), {})
     elseif self.show_buffers_idx == other_buffers_idx then
@@ -228,7 +230,7 @@ function ProjectBuffers:project_buffers()
     end
 
     for _, buf_info in pairs(vim.fn.getbufinfo({ buflisted = true })) do
-        local parts = vim.split(buf_info.name, self.root .. "/", { plain = true })
+        local parts = vim.split(buf_info.name, self.root, { plain = true })
 
         if 1 < #parts and not already_in_list(buf_info) then
             table.insert(buffers, {
@@ -250,13 +252,13 @@ end
 
 function ProjectBuffers:other_buffers()
     local buffers = {}
-    local home_dir = vim.fn.expand("$HOME")
+    local home_dir = vim.fn.expand("$HOME") .. "/"
 
     local function create_display(buf_info)
         local parts = vim.split(buf_info.name, home_dir, { plain = true })
 
         if 1 < #parts then
-            return "~" .. parts[2]
+            return "~/" .. parts[2]
         else
             return buf_info.name
         end
@@ -334,9 +336,9 @@ function ProjectBuffers.get_root()
     local git_root = vim.fn.systemlist(sh_cmd)[1]
 
     if git_root == nil then
-        return dir_path
+        return dir_path .. "/"
     else
-        return git_root
+        return git_root .. "/"
     end
 end
 
