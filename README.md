@@ -2,6 +2,8 @@
 Better management for buffers (using Telescope), great to use in combination with a project plugin like (project.nvim /
 nvim-traveller.nvim)
 
+https://github.com/Norlock/nvim-traveller-buffers/assets/7510943/6fa7b3a9-362f-4ce2-90e3-20ad19bf20da
+
 ### Why use it?
 - If you work with multiple projects, the buffer overview can get clogged up quickly using
 the builtin buffer view, but with this plugin it won't.
