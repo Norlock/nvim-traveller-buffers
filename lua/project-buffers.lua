@@ -148,7 +148,7 @@ end
 
 function ProjectBuffers:sort_buffers(buffers)
     local function compare(a, b)
-        return a.lastused < b.lastused
+        return b.lastused < a.lastused
     end
 
     table.sort(buffers, compare)
@@ -222,6 +222,7 @@ function ProjectBuffers:project_buffers()
     local function already_in_list(buf_info)
         for _, buffer in pairs(buffers) do
             if buffer.bufnr == buf_info.bufnr then
+                buffer.lastused = buf_info.lastused
                 return true
             end
         end
