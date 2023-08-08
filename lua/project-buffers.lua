@@ -64,9 +64,7 @@ function ProjectBuffers:open_telescope()
 
         self.previewers.buffer_previewer_maker(entry.value, this.state.bufnr, {
             callback = function()
-                if entry.lnum < #content then
-                    vim.api.nvim_win_set_cursor(this.state.winid, { entry.lnum, 0 })
-                end
+                -- TODO fix cursor bug some time
             end,
         })
     end
@@ -153,6 +151,11 @@ function ProjectBuffers:sort_buffers(buffers)
 
     table.sort(buffers, compare)
 
+    if 1 < #buffers then
+        local current_buf = table.remove(buffers, 1);
+        table.insert(buffers, current_buf); -- Append current buf to end
+    end
+
     if max_buffers < #buffers then
         local result = {}
 
@@ -169,8 +172,6 @@ function ProjectBuffers:sort_buffers(buffers)
 end
 
 function ProjectBuffers:refresh_buffers(skip_term_idx)
-    vim.api.nvim_win_set_cursor(self.preview_win_id, { 1, 0 })
-
     if self.show_buffers_idx == project_buffers_idx then
         self.picker:refresh(self:create_finder(self:project_buffers()), {})
     elseif self.show_buffers_idx == other_buffers_idx then
