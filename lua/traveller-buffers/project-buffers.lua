@@ -1,3 +1,6 @@
+local persist = require("traveller-buffers.persist-data")
+local debug = require("traveller-buffers.debug")
+
 local ProjectBuffers = {}
 local max_buffers = 20
 local _only_stderr = " > /dev/null"
@@ -13,7 +16,6 @@ local options = {
         preview_scrolling_up = nil,
         preview_scrolling_down = nil,
         delete_buffer = nil,
-        harpoon_buffer = nil,
     }
 }
 
@@ -34,10 +36,7 @@ function ProjectBuffers:new()
         ProjectBuffers.previewers = require("telescope.previewers")
     end
 
-    if package.loaded["harpoon"] then
-        ProjectBuffers.harpoon = require("harpoon")
-        ProjectBuffers.harpoon_mark = require("harpoon.mark")
-    end
+    o.initialized = false
 
     return o
 end
@@ -98,30 +97,15 @@ function ProjectBuffers:attach_mappings(prompt_buf_id, map)
     map('i', mappings.delete_buffer or "<C-d>", function()
         local entry = action_state.get_selected_entry()
 
-        if entry.harpoon_buffer then
-            self.harpoon_mark.rm_file(entry.value)
-        end
-
         actions.delete_buffer(prompt_buf_id)
     end)
 
     map('i', mappings.delete_all or "<C-z>", function()
-        self.action_utils.map_entries(prompt_buf_id, function(entry, index, row)
+        self.action_utils.map_entries(prompt_buf_id, function(entry, index, _)
             vim.cmd("bw " .. entry.bufnr)
         end)
 
         self:refresh_buffers(self.show_buffers_idx)
-    end)
-
-    map('i', mappings.harpoon_buffer or "<C-h>", function()
-        if self.harpoon == nil then
-            return
-        end
-
-        local entry = action_state.get_selected_entry()
-        self.harpoon_mark.toggle_file(entry.value)
-
-        self:refresh_buffers(project_buffers_idx)
     end)
 
     map('i', mappings.next_tab or "<Tab>", function()
@@ -189,35 +173,11 @@ function ProjectBuffers:refresh_buffers(skip_term_idx)
     end
 end
 
-function ProjectBuffers:harpoon_buffers(buffers)
-    local harpoon_marks = ProjectBuffers.harpoon.get_mark_config().marks
-
-    for _, buf_info in pairs(harpoon_marks) do
-        local bufnr = vim.fn.bufadd(buf_info.filename)
-
-        if buf_info.filename ~= "" then
-            table.insert(buffers, {
-                name = buf_info.filename,
-                filename = buf_info.filename,
-                display = function(entry)
-                    return entry.value .. " (H)", { { { #entry.value + 1, #entry.value + 4 }, "Comment" } }
-                end,
-                ordinal = buf_info.filename,
-                bufnr = bufnr,
-                lnum = buf_info.row,
-                col = buf_info.col,
-                lastused = 0,
-                harpoon_buffer = true,
-            })
-        end
-    end
-end
-
 function ProjectBuffers:project_buffers()
     local buffers = {}
 
-    if self.harpoon ~= nil then
-        self:harpoon_buffers(buffers)
+    if not self.initialized then
+        buffers = persist.last_used_buffers(self.root)
     end
 
     local function already_in_list(buf_info)
@@ -244,7 +204,6 @@ function ProjectBuffers:project_buffers()
                 lnum = buf_info.lnum,
                 col = 0,
                 lastused = buf_info.lastused,
-                harpoon_buffer = false,
             })
         end
     end
@@ -280,7 +239,6 @@ function ProjectBuffers:other_buffers()
                 lnum = buf_info.lnum,
                 col = 0,
                 lastused = buf_info.lastused,
-                harpoon_buffer = false,
             })
         end
     end
@@ -304,7 +262,6 @@ function ProjectBuffers:term_buffers()
                 lnum = buf_info.lnum,
                 col = 0,
                 lastused = buf_info.lastused,
-                harpoon_buffer = false,
             })
         end
     end
@@ -322,7 +279,6 @@ function ProjectBuffers:create_finder(buffers)
             bufnr = entry.bufnr,
             lnum = entry.lnum,
             col = entry.col,
-            harpoon_buffer = entry.harpoon_buffer,
         }
     end
 
@@ -347,25 +303,5 @@ end
 function ProjectBuffers.home_directory()
     return vim.fn.expand("$HOME") .. "/"
 end
-
-local path = vim.fn.stdpath('log') .. '/nvim-traveller-buffers.log'
-
-function ProjectBuffers.debug(val, label)
-    local filewrite = io.open(path, "a+")
-
-    if filewrite == nil then
-        print("Can't open debug file")
-        return
-    end
-
-    if label ~= nil then
-        filewrite:write("--" .. label .. "\n")
-    end
-
-    filewrite:write(vim.inspect(val) .. "\n\n")
-    filewrite:close()
-end
-
-ProjectBuffers.debug("Opening Neovim " .. os.date('%Y-%m-%d %H:%M:%S'))
 
 return ProjectBuffers

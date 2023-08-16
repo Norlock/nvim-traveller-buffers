@@ -7,8 +7,8 @@ https://github.com/Norlock/nvim-traveller-buffers/assets/7510943/fa4d6c12-7e49-4
 ### Why use it?
 - If you work with multiple projects, the buffer overview can get clogged up quickly using
 the builtin buffer view, but with this plugin it won't.
-- It integrates with harpoon, so you don't need to consciously stay on top of adding /
-removing buffers from the list.
+- It automatically stores the buffers of your last opened project, so you can easily continue your
+work on restart
 - Separates (project buffers / other buffers / term buffers)
 
 ## Features
@@ -16,7 +16,6 @@ removing buffers from the list.
 - [x] Deleting buffers from the list
 - [x] Sort based on last time used
 - [x] Keep a maximum of buffers (20)
-- [x] Add to/Remove from  harpoon list (optional)
 - [x] Custom mapping options
 
 ## Install
@@ -24,14 +23,12 @@ removing buffers from the list.
 #### Lazy
 ```lua
     { 'nvim-telescope/telescope.nvim',   tag = '0.1.2' },
-    'ThePrimeagen/harpoon', -- optional
     'norlock/nvim-traveller-buffers',
 ```
 
 #### Packer
 ```lua
 use 'nvim-telescope/telescope.nvim', tag = '0.1.2', -- (or whatever version)
-use 'ThePrimeagen/harpoon', -- optional
 use 'norlock/nvim-traveller-buffers',
 ```
 
